@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ceiba.adn.infrastructure.mapper.ClienteMapper">
+
+    <!-- ResultMap para la clase Cliente -->
+    <resultMap id="ClienteResult" type="Cliente">
+    <id property="documento" column="cliente_documento"/>
+    <result property="nombre" column="cliente_nombre"/>
+    <result property="telefono" column="cliente_telefono"/>
+    <result property="direccion" column="cliente_direccion"/>
+    <result property="email" column="cliente_email"/>
+    <result property="vetado" column="cliente_vetado"/>
+    
+    <collection property="itemsRentados" ofType="ItemRentado" resultMap="ItemRentadoResult" columnPrefix="rentado_"/>
+</resultMap>
+
+    <!-- ResultMap para ItemRentado -->
+<resultMap id="ItemRentadoResult" type="ItemRentado">
+    <id property="id" column="rentado_id"/>
+    <result property="fechainiciorenta" column="rentado_fechainiciorenta"/>
+    <result property="fechafinrenta" column="rentado_fechafinrenta"/>
+    
+    <association property="item" javaType="Item" resultMap="ItemResult" columnPrefix="item_"/>
+</resultMap>
+
+    <!-- ResultMap para la clase Item -->
+    <resultMap id="ItemResult" type="Item">
+    <id property="id" column="item_id"/>
+    <result property="nombre" column="item_nombre"/>
+    <result property="descripcion" column="item_descripcion"/>
+    <result property="fechalanzamiento" column="item_fechalanzamiento"/>
+    <result property="tarifaxdia" column="item_tarifaxdia"/>
+    <result property="formatorenta" column="item_formatorenta"/>
+    <result property="genero" column="item_genero"/>
+    
+    <association property="tipoItem" javaType="TipoItem" resultMap="TipoItemResult" columnPrefix="tipoitem_"/>
+</resultMap>
+
+    <!-- ResultMap para la clase TipoItem -->
+    <resultMap id="TipoItemResult" type="TipoItem">
+    <id property="id" column="tipoitem_id"/>
+    <result property="descripcion" column="tipoitem_descripcion"/>
+</resultMap>
+
+    <!-- Consulta para obtener los clientes con sus ítems rentados -->
+    <select id="consultarClientes" parameterType="map" resultMap="ClienteResult">
+    SELECT 
+        c.documento AS cliente_documento, 
+        c.nombre AS cliente_nombre, 
+        c.telefono AS cliente_telefono, 
+        c.direccion AS cliente_direccion, 
+        c.email AS cliente_email, 
+        c.vetado AS cliente_vetado,
+
+        ir.id AS rentado_id, 
+        ir.fechainiciorenta AS rentado_fechainiciorenta, 
+        ir.fechafinrenta AS rentado_fechafinrenta,
+
+        i.id AS item_id, 
+        i.nombre AS item_nombre, 
+        i.descripcion AS item_descripcion, 
+        i.fechalanzamiento AS item_fechalanzamiento, 
+        i.tarifaxdia AS item_tarifaxdia, 
+        i.formatorenta AS item_formatorenta, 
+        i.genero AS item_genero,
+
+        ti.id AS tipoitem_id, 
+        ti.descripcion AS tipoitem_descripcion
+
+    FROM VI_CLIENTES c
+    LEFT JOIN VI_ITEMRENTADO ir ON c.documento = ir.CLIENTES_documento
+    LEFT JOIN VI_ITEMS i ON ir.ITEMS_id = i.id
+    LEFT JOIN VI_TIPOITEM ti ON i.TIPOITEM_id = ti.id
+</select>
+<insert id="agregarItemRentadoACliente" parameterType="map">
+    INSERT INTO ItemsRentados (idCliente, idItem, fechaInicio, fechaFin)
+    VALUES (#{idcli}, #{iditem}, #{fechaInicio}, #{fechaFin});
+</insert>
+
+
+</mapper>

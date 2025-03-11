@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="edu.unisabana.dyas.sampleprj.dao.mybatis.mappers.ItemMapper">
+
+  <insert id="insertarItem" parameterType="map">
+    INSERT INTO Item (id, nombre, descripcion, precio)
+    VALUES (#{item.id}, #{item.nombre}, #{item.descripcion}, #{item.precio});
+  </insert>
+    
+    <resultMap id="ItemResult" type="Item">
+    <id property="id" column="id"/>
+    <result property="nombre" column="nombre"/>
+    <result property="descripcion" column="descripcion"/>
+    <result property="precio" column="precio"/>
+</resultMap>
+<resultMap type='ItemRentado' id="ItemRentadoResult">            
+    <association property="item" resultMap="edu.unisabana.dyas.sampleprj.dao.mybatis.mappers.ItemMapper.ItemResult"/>
+</resultMap>
+
+
+<select id="consultarItem" parameterType="int" resultMap="ItemResult">
+    SELECT * FROM Item WHERE id = #{id};
+</select>
+
+<select id="consultarItems" resultMap="ItemResult">
+    SELECT * FROM Item;
+</select>
+
+</mapper>
